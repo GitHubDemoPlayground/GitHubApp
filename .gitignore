@@ -1,5 +1,5 @@
 node_modules/
-dist/
+# dist/ must be committed for GitHub Actions to use the bundled action
 *.js
 *.d.ts
 *.js.map
