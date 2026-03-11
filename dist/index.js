@@ -1,4 +1,4 @@
-require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
+/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 4914:
@@ -41736,4 +41736,3 @@ exports.LRUCache = LRUCache;
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=index.js.map
