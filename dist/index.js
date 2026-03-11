@@ -38017,7 +38017,12 @@ async function createOrUpdateSyncPR(octokit, targetOwner, targetRepo, targetBran
         core.info('No files to sync. Skipping PR creation.');
         return '';
     }
-    const branchPrefix = `sync/${sourceLabel}`;
+    const sanitizedLabel = sourceLabel
+        .replace(/[^a-zA-Z0-9._-]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+        .substring(0, 60);
+    const branchPrefix = `sync/${sanitizedLabel}`;
     const timestamp = Date.now();
     const newBranchName = `${branchPrefix}-${timestamp}`;
     core.info(`Creating sync branch: ${newBranchName}`);

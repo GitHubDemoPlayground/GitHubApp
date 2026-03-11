@@ -26,7 +26,12 @@ export async function createOrUpdateSyncPR(
     return '';
   }
 
-  const branchPrefix = `sync/${sourceLabel}`;
+  const sanitizedLabel = sourceLabel
+    .replace(/[^a-zA-Z0-9._-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .substring(0, 60);
+  const branchPrefix = `sync/${sanitizedLabel}`;
   const timestamp = Date.now();
   const newBranchName = `${branchPrefix}-${timestamp}`;
 
