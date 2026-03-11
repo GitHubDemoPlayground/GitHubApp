@@ -1,0 +1,43 @@
+# Trigger Component Sync Workflow
+#
+# Place this workflow in Repo A and/or Repo B.
+# On push to main, it fires a repository_dispatch event to Repo C
+# which triggers the component sync action.
+#
+# Required secrets:
+#   APP_ID         - GitHub App ID
+#   APP_PRIVATE_KEY - GitHub App private key (base64-encoded)
+#
+# Required variables:
+#   TARGET_REPO    - Target repo in owner/repo format (e.g., my-org/repo-c)
+
+name: Trigger Component Sync
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  trigger-sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Generate GitHub App token
+      id: app-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ secrets.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+    - name: Dispatch sync event to target repo
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ steps.app-token.outputs.token }}
+        repository: ${{ vars.TARGET_REPO }}
+        event-type: component-sync
+        client-payload: |
+          {
+            "source_repo": "${{ github.repository }}",
+            "source_sha": "${{ github.sha }}",
+            "source_ref": "${{ github.ref_name }}"
+          }

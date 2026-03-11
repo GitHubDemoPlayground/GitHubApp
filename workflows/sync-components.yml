@@ -1,0 +1,52 @@
+# Component Sync Workflow
+#
+# Place this workflow in Repo C (the target/build repo).
+# Triggered by repository_dispatch from source repos (Repo A / Repo B),
+# or manually via workflow_dispatch.
+#
+# Required secrets:
+#   APP_ID          - GitHub App ID
+#   APP_PRIVATE_KEY - GitHub App private key (base64-encoded)
+#   SOURCE_REPOS    - JSON array of source repos config, e.g.:
+#     [
+#       {"owner":"my-org","repo":"repo-a","path":"src/components","targetPath":"components/repo-a"},
+#       {"owner":"my-org","repo":"repo-b","path":"src/shared","targetPath":"components/repo-b"}
+#     ]
+#
+# Required variables:
+#   TARGET_REPO     - This repo in owner/repo format (e.g., my-org/repo-c)
+
+name: Sync Components
+
+on:
+  repository_dispatch:
+    types: [ component-sync ]
+  workflow_dispatch:
+
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Log trigger info
+      run: |
+        echo "Event: ${{ github.event_name }}"
+        if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+          echo "Source repo: ${{ github.event.client_payload.source_repo }}"
+          echo "Source SHA: ${{ github.event.client_payload.source_sha }}"
+        fi
+
+    - name: Checkout sync action
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.repository_owner }}/GitHubApp
+        path: .github/sync-action
+
+    - name: Run component sync
+      uses: ./.github/sync-action
+      with:
+        app-id: ${{ secrets.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+        source-repos: ${{ secrets.SOURCE_REPOS }}
+        target-repo: ${{ vars.TARGET_REPO }}
+        target-branch: main

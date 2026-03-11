@@ -1,0 +1,23 @@
+name: 'Component Sync'
+description: 'Syncs components from source repos into a target repo via pull requests'
+inputs:
+  app-id:
+    description: 'GitHub App ID'
+    required: true
+  private-key:
+    description: 'GitHub App private key (PEM format, base64-encoded)'
+    required: true
+  source-repos:
+    description: >
+      JSON array of source repos and paths to sync. Format: [{"owner":"org","repo":"repo-a","path":"src/components","targetPath":"components/repo-a"}]
+    required: true
+  target-repo:
+    description: 'Target repository in owner/repo format (e.g., my-org/repo-c)'
+    required: true
+  target-branch:
+    description: 'Target branch in the target repo (defaults to main)'
+    required: false
+    default: 'main'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
